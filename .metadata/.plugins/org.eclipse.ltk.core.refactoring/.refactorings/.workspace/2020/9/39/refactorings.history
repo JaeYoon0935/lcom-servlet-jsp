@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;lcomjsp&apos; to &apos;lcomputerstudy&apos;" description="Rename resource &apos;lcomjsp&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="/lcomjsp" name="lcomputerstudy" stamp="1600576975614" updateReferences="true"/>
+</session>

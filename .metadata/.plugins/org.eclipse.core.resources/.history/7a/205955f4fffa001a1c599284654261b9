@@ -1,0 +1,43 @@
+package com.lcomputerstudy.testmvc.dao;
+
+import java.sql.PreparedStatement;
+
+import com.lcomputerstudy.testmvc.database.DBConnection;
+
+public class UserDAO {
+
+	private static UserDAO dao = null;
+	
+	private UserDAO() {
+		
+	}
+	
+	public static UserDAO getInstance() {
+		if(dao == null) {
+			dao = new UserDAO();
+		}
+		return dao;
+	}
+	
+	public ArrayList<User> getUsers(){
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		ArrayList<User> list = null;
+		
+		try {
+			conn = DBConnection.getConnection();
+			String query = "select * from user";
+			pstmt = conn.prepareStatement(query);
+			rs = pstmt.executeQuery();
+			list = new ArrayList<User>();
+			
+			
+			
+		}
+		
+		
+	}
+	
+	
+}

@@ -1,0 +1,44 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>회원 수정</title>
+</head>
+<body>
+<%@ include file="db_connection.jsp" %>
+	<h1>회원 정보 수정</h1>
+	<%
+	
+		String idx = request.getParameter("u_idx");
+	
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		String query = "select * from used where u_idx=?";
+		pstmt = conn.prepareStatement(query);
+		pstmt.setString(1,idx);
+		
+		rs = pstmt.executeQuery();
+	
+		while(rs.next()){
+			String u_idx = rs.getString("u_idx");
+			String u_id = rs.getString("u_id");
+			String u_password = rs.getString("u_pw");
+			String u_name = rs.getString("u_name");
+			String u_tel = rs.getString("u_tel");
+			String[] tel = u_tel.split("-");
+			String u_age = rs.getString("u_age");			
+		%>
+		<form action="editProcess.jsp" name="user" method="post">
+			<input type ="hidden" name ="u_idx" value="<%=u_idx %>">
+			<p> 아이디: <input type="text" name ="edit_id" value="<%=u_id%>"></p>
+		
+		
+		</form>
+		<%
+			}
+		%>
+</body>
+</html>
