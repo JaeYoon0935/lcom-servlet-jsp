@@ -30,18 +30,27 @@ public class UserDAO {
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		ArrayList<User> list = null;
+		int pageNum = (page-1)*3;
 		
 		try {
 			conn = DBConnection.getConnection();
-			String query = "select * from user limit ?,3";
+			String query = new StringBuilder()
+					.append("SELECT    @ROWNUM := @ROWNUM -1 AS ROWNUM,\n")
+					.append("          ta.*\n")
+					.append("FROM      user ta,\n")
+					.append("          (SELECT @rownum := (SELECT COUNT(*)-?+1 FROM user ta)) tb\n")
+					.append("LIMIT      ?, 3\n")
+					.toString();
 			pstmt = conn.prepareStatement(query);
-			pstmt.setInt(1, page);
+			pstmt.setInt(1, pageNum);
+			pstmt.setInt(2, pageNum);
 			rs = pstmt.executeQuery();
 			list = new ArrayList<User>();
 			
 			
 			while(rs.next()) {
 				User user = new User();
+				user.setRownum(rs.getInt("ROWNUM"));
 				user.setU_idx(rs.getInt("u_idx"));
 				user.setU_id(rs.getString("u_id"));
 				user.setU_name(rs.getString("u_name"));
@@ -120,5 +129,38 @@ public class UserDAO {
 			}
 		}
 		return count;
+	}
+	
+	public User loginUser(String id, String pw) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		User user = null;
+		try {
+			conn = DBConnection.getConnection();
+			String sql = "SELECT * FROM user WHERE u_id=? AND u_pw =?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);
+			rs = pstmt.executeQuery();
+			
+			if(rs.next()) {
+				user = new User();
+				user.setU_idx(rs.getInt("u_idx"));
+				user.setU_pw(rs.getString("u_pw"));
+				user.setU_id(rs.getString("u_id"));
+				user.setU_name(rs.getNString("u_name"));
+			}
+		} catch(Exception ex) {
+			System.out.println("SQLException: "+ex.getMessage());
+		} finally {
+			try {
+				if(pstmt != null) pstmt.close();
+				if(conn != null) conn.close();
+			}catch(SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return user;
 	}
 }

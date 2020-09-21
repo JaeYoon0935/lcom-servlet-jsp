@@ -34,5 +34,8 @@ public class UserService {
 		return dao.getUsersCount();
 	}
 	
+	public User loginUser(String idx, String pw) {
+		return dao.loginUser(idx,pw);
+	}
 	
 }

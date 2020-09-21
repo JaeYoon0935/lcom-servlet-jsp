@@ -9,8 +9,10 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.lcomputerstudy.testmvc.service.UserService;
+import com.lcomputerstudy.testmvc.vo.Pagination;
 import com.lcomputerstudy.testmvc.vo.User;
 
 @WebServlet("*.do")
@@ -27,8 +29,14 @@ public class Controller extends HttpServlet{
 	String contextPath = request.getContextPath();
 	String command = requestURI.substring(contextPath.length());
 	String view = null;
-	int usercount = 0;
+	String pw = null;
+	String id = null;
+	//int usercount = 0;
 	int page =1;
+	
+	
+	command = checkSession(request, response, command);
+	
 	
 	response.setContentType("text/html; charset=utf-8");
 	request.setCharacterEncoding("utf-8");
@@ -39,17 +47,17 @@ public class Controller extends HttpServlet{
 			String reqPage = request.getParameter("page");
 			if(reqPage != null) {
 				page = Integer.parseInt(reqPage);
-				page = (page-1) *3;
 			}
 		
 			UserService userService = UserService.getInstance();
 			ArrayList<User> list = userService.getUsers(page);
-			usercount = userService.getUsersCount();
-			view = "user/list";
+			Pagination pagination = new Pagination(page);
+			
 			request.setAttribute("list", list); 
-			request.setAttribute("usercount", usercount); 
+			request.setAttribute("pagination", pagination); 
 			//블로그에는 key값이 user-list라고 되어있으나 , list.jsp에서 ${list}로 받으므로
 			//key값을 list로 해줘야함.
+			view = "user/list";
 			break;
 			
 	case "/user-insert.do":
@@ -69,10 +77,68 @@ public class Controller extends HttpServlet{
 		view = "user/insert-result";
 		break;
 		
+	case "/user-login.do":
+		view = "user/login";
+		break;
+		
+	case "/user-login-process.do":
+		id = request.getParameter("login_id");
+		pw = request.getParameter("login_password");
+		
+		userService = UserService.getInstance();
+		user = userService.loginUser(id,pw); 
+		
+		
+		if(user != null) {
+			
+			HttpSession session = request.getSession();
+			session.setAttribute("user", user);
+			
+			view = "user/login-result";
+		} else {
+			view ="user/login-fail";
+		}
+		break;
+		
+	case "/logout.do":
+		HttpSession session = request.getSession();
+		session.invalidate();
+		view = "user/login";
+		
+	case "/access-denied.do":
+		view = "user/access-denied";
+		break;
 	}
 	
 	RequestDispatcher rd = request.getRequestDispatcher(view+".jsp");
 	rd.forward(request, response);
+	}
+	
+	String checkSession(HttpServletRequest request, HttpServletResponse response, String command) {
+		
+		HttpSession session = request.getSession();
+		
+		String[] authList = {
+				"/user-list.do"
+				,"/user-insert.do"
+				,"/user-insert-process.do"
+				,"/user-detail.do"
+				,"/user-edit.do"
+				,"/user-edit-process.do"
+				,"/logout.do"
+		};
+		
+		for(String item : authList) {
+			if(item.equals(command)) {
+				if(session.getAttribute("user") == null) {
+					command = "/access-denied.do";
+				}
+			}
+				
+		}
+		
+		
+		return command;
 	}
 	
 	

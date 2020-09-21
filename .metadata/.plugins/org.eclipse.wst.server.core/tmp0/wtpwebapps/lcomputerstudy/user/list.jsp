@@ -11,7 +11,7 @@
 <style>
 
 	ul{
-		width:400px;
+		width:600px;
 		height:50px;
 		margin:10px auto;
 	}
@@ -40,6 +40,7 @@
 	table tr th{
 		font-weight:700;
 	}
+	
 	table tr td, table tr th{
 		border:1px solid #818181;
 		width:200px;
@@ -58,16 +59,17 @@
 
 <table>
 		<tr>
-			<td colspan="3">전체 회원 수: ${usercount}</td>
+			<td colspan="3">전체 회원 수: ${pagination.userCount}</td>
+			<%-- ${ }는 <%= =>(표현식)을 뜻한다. --%>
 		<tr>
 			<th>No</th>
 			<th>ID</th>
 			<th>이름</th>
 		</tr>
-		<c:forEach items="${list}" var="item"> 
+		<c:forEach items="${list}" var="item" varStatus="status"> 
 		<%-- 위에서 list를 user-list로 바꿀꺼 아니면 controller.java에 setAttribute값을 list로 해줘야함 --%>
 			<tr>
-				<td><a href="user-detail.do?u_idx=${item.u_idx}">${item.u_idx}</a></td>
+				<td><a href="user-detail.do?u_idx=${item.u_idx}">${item.rownum}</a></td>
 				<td>${item.u_id}</td>
 				<td>${item.u_name}</td>
 			</tr>
@@ -75,12 +77,69 @@
 </table>
 	<div>
 		<ul>
+			<c:choose>
+				<c:when test="${pagination.prevPage lt 5 }"> 
+				<%-- lt는 <를 뜻한다. --%>
+				<li style = "display:none;"> 
+						<a href="user-list.do?page=${pagination.prevPage}">
+						 ◀
+						</a>
+					</li>
+				</c:when>
+				<c:when test="${pagination.prevPage ge 5}">
+				<%-- ge는 >=를 뜻한다. --%>
+					<li>
+						<a href="user-list.do?page=${pagination.prevPage}">
+						◀
+						</a>
+					</li>
+				</c:when>
+			</c:choose>
+			<c:forEach var="i" begin="${pagination.startPage}" end="${pagination.endPage}">
+			
+			
+				<c:choose>
+					<c:when test="${pagination.page eq i }">
+					<%-- eq는 ==을 뜻한다. --%>
+					<li style="background-color:#ededed;">
+					<span>${i}</span>
+					</li>
+				</c:when>
+					<c:when test="${pagination.page ne i }">
+					<%-- ne는 !=를 뜻한다. --%>
+					<li>
+						<a href="user-list.do?page=${i}">${i}</a>
+					</li>
+					</c:when>
+			</c:choose>
+		</c:forEach>
+		<c:choose>
+			<c:when test="${pagination.nextPage lt pagination.lastPage }">
+				<li style="">
+					<a href="user-list.do?page=${pagination.nextPage }">▶</a>
+				</li>
+			</c:when>
+			<c:when test="${pagination.nextPage ge pagination.lastPage }">
+				<li style="display:none;">
+					<a href="user-list.do?page=${pagination.nextPage }">▶</a>
+				</li>
+			</c:when>
+		</c:choose>
+		</ul>
+	</div>
+
+
+
+
+
+	<%--<div>
+		<ul>
 			<li><a href="user-list.do?page=1">1</a></li>
 			<li><a href="user-list.do?page=2">2</a></li>
 			<li><a href="user-list.do?page=3">3</a></li>
 			<li><a href="user-list.do?page=4">4</a></li>
 			<li><a href="user-list.do?page=5">5</a></li>
 		</ul>
-	</div>
+	</div>  --%>
 </body>
 </html>

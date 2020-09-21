@@ -3,12 +3,21 @@ package com.lcomputerstudy.testmvc.vo;
 public class User {
 
 	private int u_idx;
+	private int ROWNUM;
 	private String u_id;
 	private String u_pw;
 	private String u_name;
 	private String u_tel;
 	private String u_age;
 	
+	
+	
+	public int getRownum() {
+		return ROWNUM;
+	}
+	public void setRownum(int ROWNUM) {
+		this.ROWNUM = ROWNUM;
+	}
 	public int getU_idx() {
 		return u_idx;
 	}
